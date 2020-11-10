@@ -44,10 +44,11 @@ def spotify_randomiser(token):
     return True
 
 def spotify_play_track(sp, trackuri):
-    if not sp.currently_playing() or sp.currently_playing()['progress_ms'] == 0:
+    if not sp.currently_playing() or  not sp.currently_playing().get('is_playing', False):
         sp.start_playback(device_id=DEVICE, uris=[trackuri])
         return True
     else:
+        print('Something is already playing')
         return False
 
 
@@ -68,7 +69,7 @@ if __name__ == '__main__':
             tagid = f"{uid[0]}_{uid[1]}_{uid[2]}_{uid[3]}_{uid[4]}"
             trackuri = TRACKS.get(tagid,None)
             if not trackuri:
-                print('Track not found')
+                print(f'Track not found for {tagid}')
                 continue
             try:
                 sent = spotify_play_track(sp, trackuri)
