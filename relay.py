@@ -65,8 +65,11 @@ if __name__ == '__main__':
 
         (error, uid) = rdr.anticoll()
         if not error:
-            tagid = f"{uid[0]}_{uid[1]}_{uid[2]}_{uid[3]}"
-            trackuri = TRACKS[tagid]
+            tagid = f"{uid[0]}_{uid[1]}_{uid[2]}_{uid[3]}_{uid[4]}"
+            trackuri = TRACKS.get(tagid,None)
+            if not trackuri:
+                print('Track not found')
+                continue
             try:
                 sent = spotify_play_track(sp, trackuri)
             except SpotifyException as e:
