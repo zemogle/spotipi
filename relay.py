@@ -31,7 +31,7 @@ def spotify_init():
             client_id=CLIENTID,
             client_secret=CLIENTSECRET,
             show_dialog=False,
-            redirect_uri='http://www.gomez.me.uk/')
+            redirect_uri='http://www.gomez.me.uk/'))
 
 def spotify_randomiser(token):
     sp = spotipy.Spotify(auth=token)
