@@ -44,12 +44,12 @@ def spotify_randomiser(token):
     return True
 
 def spotify_play_track(sp, trackuri):
-    #if not sp.currently_playing() or  not sp.currently_playing().get('is_playing', False):
+    # if not sp.currently_playing() or  not sp.currently_playing().get('is_playing', False):
     sp.start_playback(device_id=DEVICE, uris=[trackuri])
     return True
-    #else:
-    #    print('Something is already playing')
-    #    return False
+    # else:
+    #     print('Something is already playing')
+    #     return False
 
 
 if __name__ == '__main__':
@@ -60,12 +60,16 @@ if __name__ == '__main__':
     while run:
         rdr.wait_for_tag()
 
+        (error, data) = rdr.request()
+        if not error:
+            print("\nDetected: " + format(data, "02x"))
+
         (error, uid) = rdr.anticoll()
         if not error:
             tagid = f"{uid[0]}_{uid[1]}_{uid[2]}_{uid[3]}_{uid[4]}"
             trackuri = TRACKS.get(tagid,None)
             if not trackuri:
-                print(f'Track not found for {tagid}')
+                print('Track not found for {tagid}')
                 continue
             try:
                 sent = spotify_play_track(sp, trackuri)
