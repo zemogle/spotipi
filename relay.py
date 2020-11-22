@@ -46,6 +46,7 @@ def spotify_randomiser(token):
 def spotify_play_track(sp, trackuri):
     # if not sp.currently_playing() or  not sp.currently_playing().get('is_playing', False):
     sp.start_playback(device_id=DEVICE, uris=[trackuri])
+    sp.volume(volume_percent=40)
     return True
     # else:
     #     print('Something is already playing')
