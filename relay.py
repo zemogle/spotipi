@@ -73,6 +73,7 @@ if __name__ == '__main__':
                 continue
             try:
                 sent = spotify_play_track(sp, trackuri)
+                time.sleep(5) #Delay before checking the tag reader again
             except SpotifyException as e:
                 print('Trying again to get token {}'.format(e))
                 sp = spotify_init()
