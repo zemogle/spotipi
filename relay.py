@@ -53,7 +53,7 @@ def spotify_randomiser(token):
     return True
 
 def spotify_play_track(sp, trackuri, device_id):
-    if device_id
+    if device_id:
         sp.start_playback(device_id=device_id, uris=[trackuri])
     else:
         sp.start_playback(uris=[trackuri])
