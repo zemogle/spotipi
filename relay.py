@@ -14,7 +14,7 @@ reader = SimpleMFRC522()
 
 from config import *
 
-debugLevel='WARNING'
+debugLevel='INFO'
 
 logger = logging.getLogger('mfrc522Logger')
 logger.addHandler(logging.StreamHandler())
@@ -75,7 +75,7 @@ if __name__ == '__main__':
             id, trackuri = reader.read()
             logger.info(f"ID: {id}\nURI: {trackuri}")
             if not trackuri:
-                logger.error('Track not found for {id}')
+                logger.error(f'Track not found for {id}')
                 continue
             try:
                 sent = spotify_play_track(sp, trackuri, device_id)
