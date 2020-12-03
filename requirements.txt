@@ -1,2 +1,2 @@
-pi-rc522
+mfrc522
 spotipy

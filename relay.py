@@ -6,16 +6,15 @@ from spotipy.client import SpotifyException
 import random
 import signal
 import sys
+import RPi.GPIO as GPIO
 
-from pirc522 import RFID
+from mfrc522 import SimpleMFRC522
+reader = SimpleMFRC522()
 
 from config import *
 
 
 run = True
-rdr = RFID()
-util = rdr.util()
-util.debug = True
 
 def end_read(signal,frame):
     global run
@@ -62,23 +61,14 @@ def spotify_play_track(sp, trackuri, device_id):
 
 
 if __name__ == '__main__':
-    signal.signal(signal.SIGINT, end_read)
-
     print("Starting")
     sp, device_id = spotify_init()
-    while run:
-        rdr.wait_for_tag()
-
-        (error, data) = rdr.request()
-        if not error:
-            print("\nDetected: " + format(data, "02x"))
-
-        (error, uid) = rdr.anticoll()
-        if not error:
-            tagid = f"{uid[0]}_{uid[1]}_{uid[2]}_{uid[3]}_{uid[4]}"
-            trackuri = TRACKS.get(tagid,None)
+    try:
+        while True:
+            id, trackid = reader.read()
+            print("ID: %s\nText: %s" % (id,trackid))
             if not trackuri:
-                print('Track not found for {tagid}')
+                print('Track not found for {id}')
                 continue
             try:
                 sent = spotify_play_track(sp, trackuri, device_id)
@@ -87,3 +77,6 @@ if __name__ == '__main__':
                 print('Trying again to get token and device {}'.format(e))
                 sp, device_id = spotify_init()
                 sent = spotify_play_track(sp, trackuri, device_id)
+    except KeyboardInterrupt:
+        GPIO.cleanup()
+        raise
