@@ -65,8 +65,8 @@ if __name__ == '__main__':
     sp, device_id = spotify_init()
     try:
         while True:
-            id, trackid = reader.read()
-            print("ID: %s\nText: %s" % (id,trackid))
+            id, trackuri = reader.read()
+            print("ID: %s\nText: %s" % (id, trackuri))
             if not trackuri:
                 print('Track not found for {id}')
                 continue
