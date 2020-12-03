@@ -7,18 +7,25 @@ import random
 import signal
 import sys
 import RPi.GPIO as GPIO
+import logging
 
 from mfrc522 import SimpleMFRC522
 reader = SimpleMFRC522()
 
 from config import *
 
+debugLevel='WARNING'
+
+logger = logging.getLogger('mfrc522Logger')
+logger.addHandler(logging.StreamHandler())
+level = logging.getLevelName(debugLevel)
+logger.setLevel(level)
 
 run = True
 
 def end_read(signal,frame):
     global run
-    print("\nCtrl+C captured, ending read.")
+    logger.info("\nCtrl+C captured, ending read.")
     run = False
     rdr.cleanup()
     sys.exit()
@@ -47,7 +54,7 @@ def spotify_randomiser(token):
     tracknum = random.randint(0,pl['tracks']['total'])-1
     track = pl['tracks']['items'][tracknum]['track']['uri']
     artists = [a['name'] for a in pl['tracks']['items'][tracknum]['track']['artists']]
-    print('{} by {}'.format(pl['tracks']['items'][tracknum]['track']['name'], ", ".join(artists)))
+    logger.info('{} by {}'.format(pl['tracks']['items'][tracknum]['track']['name'], ", ".join(artists)))
     sp.start_playback(device_id=DEVICE, uris=[track])
     return True
 
@@ -61,20 +68,20 @@ def spotify_play_track(sp, trackuri, device_id):
 
 
 if __name__ == '__main__':
-    print("Starting")
+    logger.info("Starting")
     sp, device_id = spotify_init()
     try:
         while True:
             id, trackuri = reader.read()
-            print("ID: %s\nText: %s" % (id, trackuri))
+            logger.info(f"ID: {id}\nURI: {trackuri}")
             if not trackuri:
-                print('Track not found for {id}')
+                logger.error('Track not found for {id}')
                 continue
             try:
                 sent = spotify_play_track(sp, trackuri, device_id)
                 time.sleep(5) #Delay before checking the tag reader again
             except SpotifyException as e:
-                print('Trying again to get token and device {}'.format(e))
+                logger.warning('Trying again to get token and device {}'.format(e))
                 sp, device_id = spotify_init()
                 sent = spotify_play_track(sp, trackuri, device_id)
     except KeyboardInterrupt:
