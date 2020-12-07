@@ -61,8 +61,8 @@ class RFIDWrapper:
             (error, uid) = self._prepare_request()
             if error: raise Exception("failed to prepare request")
 
-            error = self.rdr.card_auth(self.rdr.auth_b, 4, self.KEY, uid)
-            if error: raise Exception("failed to auth sector 1")
+            # error = self.rdr.card_auth(self.rdr.auth_b, 4, self.KEY, uid)
+            # if error: raise Exception("failed to auth sector 1")
 
             start_block = 4
             read = read_block(start_block)
@@ -70,8 +70,8 @@ class RFIDWrapper:
             print("#########################")
             print(str(read))
 
-            if read[:3] != bytes([0, 0, 3]):
-                raise Exception("Start block with invalid starting sequence: %s" % read)
+            # if read[:3] != bytes([0, 0, 3]):
+            #     raise Exception("Start block with invalid starting sequence: %s" % read)
             length = get_length(read)
             bytes_to_read = length
             print("Found NDEF with %s length" % length)
@@ -82,8 +82,8 @@ class RFIDWrapper:
                     break
                 elif i % 4 == 3:
                     #ignore every 4th blocks (reserved for key mgmt), but auth for next sector
-                    error = self.rdr.card_auth(self.rdr.auth_b, i+1, self.KEY, uid)
-                    if error: raise Exception("failed to auth sector %s" % i/4)
+                    #error = self.rdr.card_auth(self.rdr.auth_b, i+1, self.KEY, uid)
+                    #if error: raise Exception("failed to auth sector %s" % i/4)
                     continue
                 else:
                     ndef_bytes += read_block(i)[:bytes_to_read]
