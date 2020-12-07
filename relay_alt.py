@@ -216,7 +216,7 @@ def prepareOnce():
 
     run = True
     sp = None
-    device_id = os.environ["DEVICE_ID"]
+    device_id = DEVICE
     while sp == None:
         try:
             sp = spotify_init()
