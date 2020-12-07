@@ -9,7 +9,8 @@ import json
 
 import ndef
 import spotipy
-import spotipy.util as spotipy_util
+from spotipy.oauth2 import SpotifyOAuth
+from spotipy.client import SpotifyException
 from pirc522 import RFID
 
 from config import *
