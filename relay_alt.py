@@ -12,6 +12,9 @@ import spotipy
 import spotipy.util as spotipy_util
 from pirc522 import RFID
 
+from config import *
+
+
 #ToDo: rm if not needed
 class NeedsResetException(Exception):
     def __init__(self, module):
@@ -180,18 +183,21 @@ def is_tag_present():
     rdr.init()
     return present
 
-def spotify_client():
-    scope = 'user-modify-playback-state,user-read-playback-state'
-    username = os.environ['USERNAME']
-    client_id = os.environ['CLIENT_ID']
-    client_secret = os.environ['CLIENT_SECRET']
-    token = spotipy_util.prompt_for_user_token(username, scope, client_id, client_secret, "http://google.de", "/home/pi/.cache-mattelacchiato")
-    print("Acquired token: %s" % token)
 
-    if not token:
-        raise Exception("can't get token for " + username)
-    return spotipy.Spotify(auth=token)
+def get_device_id(devicelist):
+    devices = {d['name']:d['id'] for d in devicelist['devices']}
+    # Find ID of required device
+    return devices.get(DEVICE, None)
 
+def spotify_init():
+    sp = spotipy.Spotify(auth_manager=SpotifyOAuth(username=USERNAME,
+            scope=SCOPES,
+            client_id=CLIENTID,
+            client_secret=CLIENTSECRET,
+            show_dialog=False,
+            redirect_uri='http://www.gomez.me.uk/'))
+    device_id = get_device_id(sp.devices())
+    return sp, device_id
 
 def parse_records(octets):
     records = list(ndef.message_decoder(octets))
@@ -213,7 +219,7 @@ def prepareOnce():
     device_id = os.environ["DEVICE_ID"]
     while sp == None:
         try:
-            sp = spotify_client()
+            sp = spotify_init()
         except BaseException:
             traceback.print_exc(file=sys.stdout)
             time.sleep(2)
