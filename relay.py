@@ -76,11 +76,12 @@ def get_tracks():
     for i in range(0,num_items // num_cols):
         item = data['feed']['entry']
         j = i*num_cols
-        payload = {'name':item[i+1]['content']['$t'],
-                    'uri': item[i+2]['content']['$t'],
-                    'volume':item[i+3]['content']['$t']}
-        tracks[str(item[i]['content']['$t'])] = payload
-    logger.info(tracks)
+        tagid = str(item[j+1]['content']['$t'])
+        payload = {'name':item[j]['content']['$t'],
+                    'uri': item[j+2]['content']['$t'],
+                    'volume':item[j+3]['content']['$t']}
+        tracks[tagid] = payload
+        logger.info(tagid)
     return tracks
 
 def init():
