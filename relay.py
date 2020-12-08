@@ -68,7 +68,7 @@ def spotify_play_track(sp, trackuri, device_id, volume=30):
     return True
 
 def get_tracks():
-    data = requests.get(SHEET_URL)
+    data = requests.get(SHEET_URL).json()
     num_items = int(data['feed']['openSearch$totalResults']['$t'])
     tracks = {}
     num_cols = 4
