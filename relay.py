@@ -8,6 +8,7 @@ import signal
 import sys
 import RPi.GPIO as GPIO
 import logging
+import requests
 
 from mfrc522 import SimpleMFRC522
 reader = SimpleMFRC522()
