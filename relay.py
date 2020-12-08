@@ -68,6 +68,7 @@ def spotify_play_track(sp, trackuri, device_id, volume=30):
     return True
 
 def get_tracks():
+    logger.info('Setting up tracks')
     data = requests.get(SHEET_URL).json()
     num_items = int(data['feed']['openSearch$totalResults']['$t'])
     tracks = {}
@@ -77,7 +78,7 @@ def get_tracks():
         payload = {'name':item[1]['content']['$t'],
                     'uri': item[2]['content']['$t'],
                     'volume':item[3]['content']['$t']}
-        tracks[item[0]['content']['$t']] = payload
+        tracks[str(item[0]['content']['$t'])] = payload
     return tracks
 
 def init():
@@ -91,6 +92,7 @@ if __name__ == '__main__':
     try:
         while True:
             id, tmp = reader.read()
+            id = str(id)
             logger.info(f"ID: {id}")
             trackuri = tracks[id]['uri']
             volume = int(tracks[id]['volume'])
