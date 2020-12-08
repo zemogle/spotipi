@@ -17,7 +17,7 @@ from config import *
 
 debugLevel='INFO'
 
-logger = logging.getLogger('mfrc522Logger')
+logger = logging.getLogger('spotipy')
 logger.addHandler(logging.StreamHandler())
 level = logging.getLevelName(debugLevel)
 logger.setLevel(level)
@@ -75,10 +75,10 @@ def get_tracks():
     num_cols = 4
     for i in range(0,num_items // num_cols):
         item = data['feed']['entry']
-        payload = {'name':item[1]['content']['$t'],
-                    'uri': item[2]['content']['$t'],
-                    'volume':item[3]['content']['$t']}
-        tracks[str(item[0]['content']['$t'])] = payload
+        payload = {'name':item[i+1]['content']['$t'],
+                    'uri': item[i+2]['content']['$t'],
+                    'volume':item[i+3]['content']['$t']}
+        tracks[str(item[i]['content']['$t'])] = payload
     logger.info(tracks)
     return tracks
 
