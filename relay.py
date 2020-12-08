@@ -59,32 +59,51 @@ def spotify_randomiser(token):
     sp.start_playback(device_id=DEVICE, uris=[track])
     return True
 
-def spotify_play_track(sp, trackuri, device_id):
+def spotify_play_track(sp, trackuri, device_id, volume=30):
     if device_id:
         sp.start_playback(device_id=device_id, uris=[trackuri])
     else:
         sp.start_playback(uris=[trackuri])
-    sp.volume(volume_percent=30)
+    sp.volume(volume_percent=volume)
     return True
 
+def get_tracks():
+    data = requests.get(SHEET_URL)
+    num_items = int(data['feed']['openSearch$totalResults']['$t'])
+    tracks = {}
+    num_cols = 4
+    for i in range(0,num_items // num_cols):
+        item = data['feed']['entry']
+        payload = {'name':item[1]['content']['$t'],
+                    'uri': item[2]['content']['$t'],
+                    'volume':item[3]['content']['$t']}
+        tracks[item[0]['content']['$t']] = payload
+    return tracks
+
+def init():
+    sp, device_id = spotify_init()
+    tracks = get_tracks()
+    return sp, device_id, tracks
 
 if __name__ == '__main__':
     logger.info("Starting")
-    sp, device_id = spotify_init()
+    sp, device_id, tracks = init()
     try:
         while True:
-            id, trackuri = reader.read()
-            logger.info(f"ID: {id}\nURI: {trackuri}")
-            if not trackuri:
-                logger.error(f'Track not found for {id}')
-                continue
+            id, tmp = reader.read()
+            logger.info(f"ID: {id}")
             try:
-                sent = spotify_play_track(sp, trackuri, device_id)
+                trackuri = tracks[id]['uri']
+                volume = int(tracks[id]['volume'])
+                name = tracks[id]['name']
+            try:
+                sent = spotify_play_track(sp, trackuri, device_id, volume=volume)
+                logger.info(f'Playing {name}')
                 time.sleep(5) #Delay before checking the tag reader again
             except SpotifyException as e:
                 logger.warning('Trying again to get token and device {}'.format(e))
                 sp, device_id = spotify_init()
-                sent = spotify_play_track(sp, trackuri, device_id)
+                sent = spotify_play_track(sp, trackuri, device_id, volume=volume)
     except KeyboardInterrupt:
         GPIO.cleanup()
         raise
