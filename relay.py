@@ -92,10 +92,9 @@ if __name__ == '__main__':
         while True:
             id, tmp = reader.read()
             logger.info(f"ID: {id}")
-            try:
-                trackuri = tracks[id]['uri']
-                volume = int(tracks[id]['volume'])
-                name = tracks[id]['name']
+            trackuri = tracks[id]['uri']
+            volume = int(tracks[id]['volume'])
+            name = tracks[id]['name']
             try:
                 sent = spotify_play_track(sp, trackuri, device_id, volume=volume)
                 logger.info(f'Playing {name}')
