@@ -79,6 +79,7 @@ def get_tracks():
                     'uri': item[2]['content']['$t'],
                     'volume':item[3]['content']['$t']}
         tracks[str(item[0]['content']['$t'])] = payload
+    logger.info(tracks)
     return tracks
 
 def init():
