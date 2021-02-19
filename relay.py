@@ -6,14 +6,19 @@ from spotipy.client import SpotifyException
 import random
 import signal
 import sys
-import RPi.GPIO as GPIO
 import logging
 import requests
 
-from mfrc522 import SimpleMFRC522
-reader = SimpleMFRC522()
+import RPi.GPIO as GPIO
+
+import pn532.pn532 as nfc
+from pn532 import *
 
 from config import *
+
+pn532 = PN532_I2C(debug=False, reset=20, req=16)
+pn532.SAM_configuration()
+
 
 debugLevel='INFO'
 
@@ -59,11 +64,15 @@ def spotify_randomiser(token):
     sp.start_playback(device_id=DEVICE, uris=[track])
     return True
 
-def spotify_play_track(sp, trackuri, device_id, volume=30):
+def spotify_play_track(sp, id, device_id):
+    trackuri = tracks[id]['uri']
+    volume = int(tracks[id]['volume'])
+    name = tracks[id]['name']
     if device_id:
         sp.start_playback(device_id=device_id, uris=[trackuri])
     else:
         sp.start_playback(uris=[trackuri])
+    logger.info(f'Playing {name}')
     sp.volume(volume_percent=volume)
     return True
 
@@ -92,22 +101,25 @@ def init():
 if __name__ == '__main__':
     logger.info("Starting")
     sp, device_id, tracks = init()
+    current_card = None
     try:
         while True:
-            id, tmp = reader.read()
-            id = str(id)
-            logger.info(f"ID: {id}")
-            trackuri = tracks[id]['uri']
-            volume = int(tracks[id]['volume'])
-            name = tracks[id]['name']
-            try:
-                sent = spotify_play_track(sp, trackuri, device_id, volume=volume)
-                logger.info(f'Playing {name}')
-                time.sleep(5) #Delay before checking the tag reader again
-            except SpotifyException as e:
-                logger.warning('Trying again to get token and device {}'.format(e))
-                sp, device_id = spotify_init()
-                sent = spotify_play_track(sp, trackuri, device_id, volume=volume)
+            # Check if a card is available to read
+            id = pn532.read_passive_target(timeout=0.5)
+            # Try again if no card is available.
+            if id is None:
+                sp.pause_playback(device_id=device_id)
+                continue
+            elif id.hex() != current_card:
+                logger.debug(f'Found card with UID:{id.hex()}')
+                current_card = id.hex()
+                try:
+                    sent = spotify_play_track(sp, current_card, device_id)
+                    time.sleep(5) #Delay before checking the tag reader again
+                except SpotifyException as e:
+                    logger.warning('Trying again to get token and device {}'.format(e))
+                    sp, device_id = spotify_init()
+                    sent = spotify_play_track(sp, trackuri, device_id, volume=volume)
     except KeyboardInterrupt:
         GPIO.cleanup()
         raise
