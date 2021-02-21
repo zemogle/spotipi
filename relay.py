@@ -111,7 +111,7 @@ if __name__ == '__main__':
                 sp.pause_playback(device_id=device_id)
                 current_card = None
                 continue
-            elif id.hex() != current_card:
+            elif id and id.hex() != current_card:
                 logger.debug(f'Found card with UID:{id.hex()}')
                 current_card = id.hex()
                 try:
