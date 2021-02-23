@@ -65,7 +65,10 @@ def spotify_randomiser(token):
     return True
 
 def spotify_play_track(sp, id, device_id):
-    trackuri = tracks[id]['uri']
+    try:
+        trackuri = tracks[id]['uri']
+    except:
+        raise SpotifyException('UID not recognised')
     volume = int(tracks[id]['volume'])
     name = tracks[id]['name']
     if device_id:
@@ -118,7 +121,7 @@ if __name__ == '__main__':
                     sent = spotify_play_track(sp, current_card, device_id)
                     time.sleep(5) #Delay before checking the tag reader again
                 except SpotifyException as e:
-                    logger.warning('Trying again to get token and device {}'.format(e))
+                    logger.warning('Problem with playback {}'.format(e))
                     sp, device_id = spotify_init()
                     sent = spotify_play_track(sp, trackuri, device_id, volume=volume)
     except KeyboardInterrupt:
