@@ -123,7 +123,6 @@ if __name__ == '__main__':
                 except SpotifyException as e:
                     logger.warning('Problem with playback {}'.format(e))
                     sp, device_id = spotify_init()
-                    sent = spotify_play_track(sp, trackuri, device_id, volume=volume)
     except KeyboardInterrupt:
         GPIO.cleanup()
         raise
