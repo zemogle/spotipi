@@ -68,7 +68,7 @@ def spotify_play_track(sp, id, device_id):
     try:
         trackuri = tracks[id]['uri']
     except:
-        raise SpotifyException('UID not recognised')
+        logger.error(f'UID not recognised: {id}')
     volume = int(tracks[id]['volume'])
     name = tracks[id]['name']
     if device_id:
