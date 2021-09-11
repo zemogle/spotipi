@@ -8,6 +8,8 @@ import signal
 import sys
 import logging
 import requests
+import blinkt
+from random import randint
 
 try:
     import RPi.GPIO as GPIO
@@ -66,17 +68,28 @@ def spotify_randomiser(token):
     sp.start_playback(device_id=DEVICE, uris=[track])
     return True
 
+def colour_lights():
+    for x in range(0,7):
+        blinkt.set_pixel(x, randint(0,255),randint(0,255),randint(0,255), brightness=30)
+    blinkt.show()
+    return
+
 def spotify_play_track(sp, id, device_id):
+    colour_lights()
     tracks = TRACKS
     try:
         trackuri = tracks[id]['uri']
-    except:
-        logger.error(f'UID not recognised: {id}')
+    except Exception as e:
+        logger.error(f'UID not recognised: {id} {e}')
+        blinkt.set_all(255,0,0, brightness=30)
+        blinkt.show()
         return False
     volume = int(tracks[id]['volume'])
     name = tracks[id]['name']
     if device_id:
         sp.start_playback(device_id=device_id, uris=[trackuri])
+        blinkt.set_all(0,255,0, brightness=30)
+        blinkt.show()
     else:
         sp.start_playback(uris=[trackuri])
     logger.info(f'Playing {name}')
@@ -115,6 +128,8 @@ if __name__ == '__main__':
             id = pn532.read_passive_target(timeout=0.5)
             # Try again if no card is available.
             if not id and current_card:
+                blinkt.set_all(255,153,62, brightness=30)
+                blinkt.show()
                 sp.pause_playback(device_id=device_id)
                 current_card = None
                 continue
@@ -122,11 +137,15 @@ if __name__ == '__main__':
                 logger.debug(f'Found card with UID:{id.hex()}')
                 current_card = id.hex()
                 try:
-                    sent = spotify_play_track(sp, current_card, device_id)
+                    sent = spotify_play_track(sp, str(current_card), device_id)
                     time.sleep(5) #Delay before checking the tag reader again
                 except SpotifyException as e:
                     logger.warning('Problem with playback {}'.format(e))
+                    blinkt.set_all(255,153,62, brightness=30)
+                    blinkt.show()
                     sp, device_id = spotify_init()
     except KeyboardInterrupt:
         GPIO.cleanup()
+        blinkt.clear()
+        blinkt.show()
         raise
