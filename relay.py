@@ -127,6 +127,8 @@ if __name__ == '__main__':
             # Check if a card is available to read
             id = pn532.read_passive_target(timeout=0.5)
             # Try again if no card is available.
+            blinkt.clear()
+            blinkt.show()
             if not id and current_card:
                 blinkt.set_all(255,153,62, brightness=30)
                 blinkt.show()
