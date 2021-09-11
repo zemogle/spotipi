@@ -80,8 +80,8 @@ def spotify_play_track(sp, id, device_id):
     sp.volume(volume_percent=volume)
     return True
 
-def get_tracks():
-    logger.info('Setting up tracks')
+def get_tracks_google():
+    logger.info('Setting up tracks from Google Sheet')
     data = requests.get(SHEET_URL).json()
     num_items = int(data['feed']['openSearch$totalResults']['$t'])
     tracks = {}
@@ -99,8 +99,8 @@ def get_tracks():
 
 def init():
     sp, device_id = spotify_init()
-    tracks = get_tracks()
-    return sp, device_id, tracks
+    # tracks = get_tracks_google()
+    return sp, device_id, TRACKS
 
 if __name__ == '__main__':
     logger.info("Starting")
