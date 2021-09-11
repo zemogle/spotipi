@@ -88,8 +88,7 @@ def spotify_play_track(sp, id, device_id):
     name = tracks[id]['name']
     if device_id:
         sp.start_playback(device_id=device_id, uris=[trackuri])
-        blinkt.set_all(0,255,0, brightness=30)
-        blinkt.show()
+        colour_lights()
     else:
         sp.start_playback(uris=[trackuri])
     logger.info(f'Playing {name}')
@@ -130,7 +129,7 @@ if __name__ == '__main__':
             blinkt.clear()
             blinkt.show()
             if not id and current_card:
-                blinkt.set_all(255,153,62, brightness=30)
+                blinkt.set_all(227,107,0, brightness=30)
                 blinkt.show()
                 sp.pause_playback(device_id=device_id)
                 current_card = None
