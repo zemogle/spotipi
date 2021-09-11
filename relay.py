@@ -9,15 +9,17 @@ import sys
 import logging
 import requests
 
-import RPi.GPIO as GPIO
-
-import pn532.pn532 as nfc
-from pn532 import *
+try:
+    import RPi.GPIO as GPIO
+    import pn532.pn532 as nfc
+    from pn532 import *
+    pn532 = PN532_I2C(debug=False, reset=20, req=16)
+    pn532.SAM_configuration()
+except:
+    print('Running in dev mode')
 
 from config import *
 
-pn532 = PN532_I2C(debug=False, reset=20, req=16)
-pn532.SAM_configuration()
 
 
 debugLevel='INFO'
@@ -65,6 +67,7 @@ def spotify_randomiser(token):
     return True
 
 def spotify_play_track(sp, id, device_id):
+    tracks = TRACKS
     try:
         trackuri = tracks[id]['uri']
     except:
@@ -99,12 +102,12 @@ def get_tracks_google():
 
 def init():
     sp, device_id = spotify_init()
-    # tracks = get_tracks_google()
-    return sp, device_id, TRACKS
+    tracks = get_tracks_google()
+    return sp, device_id, tracks
 
 if __name__ == '__main__':
     logger.info("Starting")
-    sp, device_id, tracks = init()
+    sp, device_id = spotify_init()
     current_card = None
     try:
         while True:
