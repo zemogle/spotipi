@@ -80,7 +80,7 @@ def spotify_play_track(sp, id, device_id):
     try:
         trackuri = tracks[id]['uri']
     except Exception as e:
-        logger.error(f'UID not recognised: {id} {e}')
+        logger.error('UID not recognised: {} {}'.format(id,e))
         blinkt.set_all(255,0,0, brightness=30)
         blinkt.show()
         return False
@@ -91,7 +91,7 @@ def spotify_play_track(sp, id, device_id):
         colour_lights()
     else:
         sp.start_playback(uris=[trackuri])
-    logger.info(f'Playing {name}')
+    logger.info('Playing {}'.format(name))
     sp.volume(volume_percent=volume)
     return True
 
@@ -135,7 +135,7 @@ if __name__ == '__main__':
                 current_card = None
                 continue
             elif id and id.hex() != current_card:
-                logger.debug(f'Found card with UID:{id.hex()}')
+                logger.debug('Found card with UID:{}').format(id.hex())
                 current_card = id.hex()
                 try:
                     sent = spotify_play_track(sp, str(current_card), device_id)
